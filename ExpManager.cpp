@@ -382,27 +382,27 @@ void ExpManager::run_a_step() {
     }
 
     // Search for the best
-    double best_fitness = prev_internal_organisms_[0]->fitness;
-    int idx_best = 0;
-    for (int indiv_id = 1; indiv_id < nb_indivs_; indiv_id++) {
-        if (prev_internal_organisms_[indiv_id]->fitness > best_fitness) {
-            idx_best = indiv_id;
-            best_fitness = prev_internal_organisms_[indiv_id]->fitness;
-        }
-    }
-    best_indiv = prev_internal_organisms_[idx_best];
+    // double best_fitness = prev_internal_organisms_[0]->fitness;
+    // int idx_best = 0;
+    // for (int indiv_id = 1; indiv_id < nb_indivs_; indiv_id++) {
+    //     if (prev_internal_organisms_[indiv_id]->fitness > best_fitness) {
+    //         idx_best = indiv_id;
+    //         best_fitness = prev_internal_organisms_[indiv_id]->fitness;
+    //     }
+    // }
+    // best_indiv = prev_internal_organisms_[idx_best];
 
     // Stats
-    stats_best->reinit(AeTime::time());
-    stats_mean->reinit(AeTime::time());
+    // stats_best->reinit(AeTime::time());
+    // stats_mean->reinit(AeTime::time());
 
-    for (int indiv_id = 0; indiv_id < nb_indivs_; indiv_id++) {
-        if (dna_mutator_array_[indiv_id]->hasMutate())
-            prev_internal_organisms_[indiv_id]->compute_protein_stats();
-    }
+    // for (int indiv_id = 0; indiv_id < nb_indivs_; indiv_id++) {
+    //     if (dna_mutator_array_[indiv_id]->hasMutate())
+    //         prev_internal_organisms_[indiv_id]->compute_protein_stats();
+    // }
 
-    stats_best->write_best(best_indiv);
-    stats_mean->write_average(prev_internal_organisms_, nb_indivs_);
+    // stats_best->write_best(best_indiv);
+    // stats_mean->write_average(prev_internal_organisms_, nb_indivs_);
 }
 
 
@@ -424,8 +424,8 @@ void ExpManager::run_evolution(int nb_gen) {
     FLUSH_TRACES(0)
 
     // Stats
-    stats_best = new Stats(AeTime::time(), true);
-    stats_mean = new Stats(AeTime::time(), false);
+    // stats_best = new Stats(AeTime::time(), true);
+    // stats_mean = new Stats(AeTime::time(), false);
 
     // printf("Running evolution from %d to %d\n", AeTime::time(), AeTime::time() + nb_gen);
 
@@ -449,7 +449,7 @@ void ExpManager::run_evolution(int nb_gen) {
     }
 
     for (int indiv_id = 0; indiv_id < nb_indivs_; ++indiv_id) {
-        printf("%d: %1.10e | ", indiv_id, prev_internal_organisms_[indiv_id]->fitness);
+        printf("%1.5e,", prev_internal_organisms_[indiv_id]->fitness);
     }
     printf("\n");
 

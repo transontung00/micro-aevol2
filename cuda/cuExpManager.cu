@@ -327,7 +327,7 @@ __global__
 void check_result(uint nb_indivs, cuIndividual* individuals) {
     for (int indiv_idx = 0; indiv_idx < nb_indivs; ++indiv_idx) {
         const auto& indiv = individuals[indiv_idx];
-        printf("%d: %1.10e | ", indiv_idx, indiv.fitness);
+        printf("%1.5e,", indiv.fitness);
     }
     printf("\n");
 }
