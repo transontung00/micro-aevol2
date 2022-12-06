@@ -93,7 +93,7 @@ ExpManager::ExpManager(int grid_height, int grid_width, int seed, double mutatio
     delete g2;
     delete g3;
 
-    printf("Initialized environmental target %f\n", geometric_area);
+    // printf("Initialized environmental target %f\n", geometric_area);
 
 
     // Initializing the PRNGs
@@ -115,7 +115,7 @@ ExpManager::ExpManager(int grid_height, int grid_width, int seed, double mutatio
 
 //    internal_organisms_[0]->print_info();
 
-    printf("Populating the environment\n");
+    // printf("Populating the environment\n");
 
     // Create a population of clones based on the randomly generated organism
     for (int indiv_id = 0; indiv_id < nb_indivs_; indiv_id++) {
@@ -143,7 +143,7 @@ ExpManager::ExpManager(int time) {
         geometric_area += ((fabs(target[i]) + fabs(target[i + 1])) / (2 * (double) FUZZY_SAMPLING));
     }
 
-    printf("Initialized environmental target %f\n", geometric_area);
+    // printf("Initialized environmental target %f\n", geometric_area);
 
     dna_mutator_array_ = new DnaMutator *[nb_indivs_];
     for (int indiv_id = 0; indiv_id < nb_indivs_; ++indiv_id) {
@@ -427,14 +427,14 @@ void ExpManager::run_evolution(int nb_gen) {
     stats_best = new Stats(AeTime::time(), true);
     stats_mean = new Stats(AeTime::time(), false);
 
-    printf("Running evolution from %d to %d\n", AeTime::time(), AeTime::time() + nb_gen);
+    // printf("Running evolution from %d to %d\n", AeTime::time(), AeTime::time() + nb_gen);
 
     for (int gen = 0; gen < nb_gen; gen++) {
         AeTime::plusplus();
 
         TIMESTAMP(1, run_a_step();)
 
-        printf("Generation %d : Best individual fitness %e\n", AeTime::time(), best_indiv->fitness);
+        // printf("Generation %d : Best individual fitness %e\n", AeTime::time(), best_indiv->fitness);
         FLUSH_TRACES(gen)
 
         for (int indiv_id = 0; indiv_id < nb_indivs_; ++indiv_id) {
@@ -444,8 +444,14 @@ void ExpManager::run_evolution(int nb_gen) {
 
         if (AeTime::time() % backup_step_ == 0) {
             save(AeTime::time());
-            cout << "Backup for generation " << AeTime::time() << " done !" << endl;
+            // cout << "Backup for generation " << AeTime::time() << " done !" << endl;
         }
     }
+
+    for (int indiv_id = 0; indiv_id < nb_indivs_; ++indiv_id) {
+        printf("%d: %1.10e | ", indiv_id, prev_internal_organisms_[indiv_id]->fitness);
+    }
+    printf("\n");
+
     STOP_TRACER
 }

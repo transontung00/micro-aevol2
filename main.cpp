@@ -29,6 +29,7 @@
 #include <iostream>
 #include <getopt.h>
 #include <cstring>
+#include <sys/time.h>
 
 #ifdef USE_CUDA
 #include "cuda/cuExpManager.h"
@@ -161,10 +162,10 @@ int main(int argc, char* argv[]) {
     }
 
 #ifdef USE_CUDA
-    printf("Activate CUDA\n");
+    // printf("Activate CUDA\n");
 #endif
 
-    printf("Start ExpManager\n");
+    // printf("Start ExpManager\n");
 
     if (resume >= 0) {
         if ((width != -1) || (height != -1)|| (mutation_rate != -1.0) || (genome_size != -1) ||
@@ -198,7 +199,15 @@ int main(int argc, char* argv[]) {
     delete tmp;
 #endif
 
+    struct timeval begin, end;
+    gettimeofday(&begin, NULL);
+
     exp_manager->run_evolution(nbstep);
+
+    gettimeofday(&end, NULL);
+
+    double time = 1.0 * (end.tv_sec - begin.tv_sec) + 1.0e-6 * (end.tv_usec - begin.tv_usec);
+    printf("%lf\n", time);
 
     delete exp_manager;
 
