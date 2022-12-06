@@ -340,9 +340,13 @@ void do_mutation(uint nb_indivs, cuIndividual* individuals, double mutation_rate
         return;
 
     auto& indiv = individuals[indiv_idx];
+    indiv.mutated = false;
+
     auto nb_switch = rand_service->binomial_random(indiv.size, mutation_rate, indiv_idx, MUTATION);
 
     for (int i = 0; i < nb_switch; ++i) {
+        indiv.mutated = true;
+
         auto position = rand_service->gen_number_max(indiv.size, indiv_idx, MUTATION);
         if (indiv.genome[position] == '0') indiv.genome[position] = '1';
         else indiv.genome[position] = '0';
@@ -447,40 +451,55 @@ void clean_metadata(uint nb_indivs, cuIndividual* individuals) {
     auto idx = threadIdx.x + blockIdx.x * blockDim.x;
     auto stride = blockDim.x * gridDim.x;
 
-    for (int i = idx; i < nb_indivs; i += stride)
-        individuals[i].clean_metadata();
+    for (int i = idx; i < nb_indivs; i += stride) {
+        if (individuals[i].mutated) {
+          individuals[i].clean_metadata();
+        }
+    }
 }
 
 __global__
 void search_patterns(uint nb_indivs, cuIndividual* individuals) {
     // One block per individual
     auto indiv_idx = blockIdx.x;
-    if (indiv_idx < nb_indivs)
-        individuals[indiv_idx].search_patterns();
+    if (indiv_idx < nb_indivs) {
+        if (individuals[indiv_idx].mutated) {
+          individuals[indiv_idx].search_patterns();
+        }
+    }
 }
 
 __global__
 void sparse_meta(uint nb_indivs, cuIndividual* individuals) {
     // One block per individual
     auto indiv_idx = blockIdx.x;
-    if (indiv_idx < nb_indivs)
-        individuals[indiv_idx].sparse_meta();
+    if (indiv_idx < nb_indivs) {
+        if (individuals[indiv_idx].mutated) {
+          individuals[indiv_idx].sparse_meta();
+        }
+    }
 }
 
 __global__
 void transcription(uint nb_indivs, cuIndividual* individuals) {
     // One block per individual
     auto indiv_idx = blockIdx.x;
-    if (indiv_idx < nb_indivs)
-        individuals[indiv_idx].transcription();
+    if (indiv_idx < nb_indivs) {
+        if (individuals[indiv_idx].mutated) {
+          individuals[indiv_idx].transcription();
+        }
+    }
 }
 
 __global__
 void find_gene_per_RNA(uint nb_indivs, cuIndividual* individuals) {
     // One block per individual
     auto indiv_idx = blockIdx.x;
-    if (indiv_idx < nb_indivs)
-        individuals[indiv_idx].find_gene_per_RNA();
+    if (indiv_idx < nb_indivs) {
+        if (individuals[indiv_idx].mutated) {
+          individuals[indiv_idx].find_gene_per_RNA();
+        }
+    }
 }
 
 __global__
@@ -489,29 +508,41 @@ void gather_genes(uint nb_indivs, cuIndividual* individuals) {
     auto idx = threadIdx.x + blockIdx.x * blockDim.x;
     auto stride = blockDim.x * gridDim.x;
 
-    for (int i = idx; i < nb_indivs; i += stride)
-        individuals[i].gather_genes();
+    for (int i = idx; i < nb_indivs; i += stride) {
+        if (individuals[i].mutated) {
+          individuals[i].gather_genes();
+        }
+    }
 }
 
 __global__ void translation(uint size, cuIndividual* individuals) {
     // On block per individual
     auto indiv_idx = blockIdx.x;
-    if (indiv_idx < size)
-        individuals[indiv_idx].translation();
+    if (indiv_idx < size) {
+        if (individuals[indiv_idx].mutated) {
+          individuals[indiv_idx].translation();
+        }
+    }
 }
 
 __global__ void compute_phenotype(uint size, cuIndividual* individuals) {
     // On block per individual
     auto indiv_idx = blockIdx.x;
-    if (indiv_idx < size)
-        individuals[indiv_idx].compute_phenotype();
+    if (indiv_idx < size) {
+        if (individuals[indiv_idx].mutated) {
+          individuals[indiv_idx].compute_phenotype();
+        }
+    }
 }
 
 __global__ void compute_fitness(uint size, cuIndividual* individuals, const double* target) {
     // On block per individual
     auto indiv_idx = blockIdx.x;
-    if (indiv_idx < size)
+    if (indiv_idx < size) {
+      if (individuals[indiv_idx].mutated) {
         individuals[indiv_idx].compute_fitness(target);
+      }
+    }
 }
 
 // Interface Host | Device
@@ -570,6 +601,7 @@ void init_device_population(int nb_indivs, int genome_length, cuIndividual* all_
         local_indiv.list_gene = nullptr;
         local_indiv.list_protein = nullptr;
         local_indiv.fitness = 0.0;
+        local_indiv.mutated = true;
         for (int j = 0; j < FUZZY_SAMPLING; ++j) {
             local_indiv.phenotype[j] = 0.0;
         }

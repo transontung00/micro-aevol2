@@ -91,4 +91,6 @@ struct cuIndividual {
 
     double phenotype[FUZZY_SAMPLING]{};
     double fitness{};
+
+    bool mutated{};
 };
