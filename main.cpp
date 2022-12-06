@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
     gettimeofday(&end, NULL);
 
     double time = 1.0 * (end.tv_sec - begin.tv_sec) + 1.0e-6 * (end.tv_usec - begin.tv_usec);
-    printf("%d,%d,%d,%lf,%lf\n", width, height, genome_size, mutation_rate, time);
+    printf("%s,%d,%d,%d,%lf,%lf\n", "default", width, height, genome_size, mutation_rate, time);
 
     delete exp_manager;
 
