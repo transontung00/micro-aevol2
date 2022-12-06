@@ -6,21 +6,26 @@
 
 #include <cassert>
 
-Dna::Dna(int length, Threefry::Gen &&rng) : seq_(length) {
+// Dna::Dna(int length, Threefry::Gen &&rng) : seq_(length) {
+Dna::Dna(int length, Threefry::Gen &&rng) {
+
+    seq_bitset_ = boost::dynamic_bitset<>(length);
+
     // Generate a random genome
     for (int32_t i = 0; i < length; i++) {
-        seq_[i] = '0' + rng.random(NB_BASE);
+        // seq_[i] = '0' + rng.random(NB_BASE);
+        seq_bitset_[i] = rng.random(NB_BASE);
     }
 }
 
 int Dna::length() const {
-    return seq_.size();
+    return seq_bitset_.size();
 }
 
 void Dna::save(gzFile backup_file) {
     int dna_length = length();
     gzwrite(backup_file, &dna_length, sizeof(dna_length));
-    gzwrite(backup_file, seq_.data(), dna_length * sizeof(seq_[0]));
+    // gzwrite(backup_file, seq_.data(), dna_length * sizeof(seq_[0]));
 }
 
 void Dna::load(gzFile backup_file) {
@@ -30,11 +35,11 @@ void Dna::load(gzFile backup_file) {
     char tmp_seq[dna_length];
     gzread(backup_file, tmp_seq, dna_length * sizeof(tmp_seq[0]));
 
-    seq_ = std::vector<char>(tmp_seq, tmp_seq + dna_length);
+    // seq_ = std::vector<char>(tmp_seq, tmp_seq + dna_length);
 }
 
-void Dna::set(int pos, char c) {
-    seq_[pos] = c;
+void Dna::set(int pos, bool c) {
+    seq_bitset_[pos] = c;
 }
 
 /**
@@ -44,8 +49,8 @@ void Dna::set(int pos, char c) {
  * @param pos_2
  */
 void Dna::remove(int pos_1, int pos_2) {
-    assert(pos_1 >= 0 && pos_2 >= pos_1 && pos_2 <= seq_.size());
-    seq_.erase(seq_.begin() + pos_1, seq_.begin() + pos_2);
+    // assert(pos_1 >= 0 && pos_2 >= pos_1 && pos_2 <= seq_.size());
+    // seq_.erase(seq_.begin() + pos_1, seq_.begin() + pos_2);
 }
 
 /**
@@ -57,9 +62,9 @@ void Dna::remove(int pos_1, int pos_2) {
  */
 void Dna::insert(int pos, std::vector<char> seq) {
 // Insert sequence 'seq' at position 'pos'
-    assert(pos >= 0 && pos < seq_.size());
+    // assert(pos >= 0 && pos < seq_.size());
 
-    seq_.insert(seq_.begin() + pos, seq.begin(), seq.end());
+    // seq_.insert(seq_.begin() + pos, seq.begin(), seq.end());
 }
 
 /**
@@ -71,14 +76,14 @@ void Dna::insert(int pos, std::vector<char> seq) {
  */
 void Dna::insert(int pos, Dna *seq) {
 // Insert sequence 'seq' at position 'pos'
-    assert(pos >= 0 && pos < seq_.size());
+    // assert(pos >= 0 && pos < seq_.size());
 
-    seq_.insert(seq_.begin() + pos, seq->seq_.begin(), seq->seq_.end());
+    // seq_.insert(seq_.begin() + pos, seq->seq_.begin(), seq->seq_.end());
 }
 
 void Dna::do_switch(int pos) {
-    if (seq_[pos] == '0') seq_[pos] = '1';
-    else seq_[pos] = '0';
+    if (seq_bitset_[pos] == '0') seq_bitset_[pos] = '1';
+    else seq_bitset_[pos] = '0';
 }
 
 void Dna::do_duplication(int pos_1, int pos_2, int pos_3) {
@@ -97,10 +102,10 @@ void Dna::do_duplication(int pos_1, int pos_2, int pos_3) {
         //                                             -----      |
         //                                             pos_2    <-'
         //
-        std::vector<char> seq_dupl =
-                std::vector<char>(seq_.begin() + pos_1, seq_.begin() + pos_2);
+        // std::vector<char> seq_dupl =
+        //         std::vector<char>(seq_.begin() + pos_1, seq_.begin() + pos_2);
 
-        insert(pos_3, seq_dupl);
+        // insert(pos_3, seq_dupl);
     } else { // if (pos_1 >= pos_2)
         // The segment to duplicate includes the origin of replication.
         // The copying process will be done in two steps.
@@ -114,11 +119,11 @@ void Dna::do_duplication(int pos_1, int pos_2, int pos_3) {
         //                                                  -----
         //
         //
-        std::vector<char>
-                seq_dupl = std::vector<char>(seq_.begin() + pos_1, seq_.end());
-        seq_dupl.insert(seq_dupl.end(), seq_.begin(), seq_.begin() + pos_2);
+        // std::vector<char>
+        //         seq_dupl = std::vector<char>(seq_.begin() + pos_1, seq_.end());
+        // seq_dupl.insert(seq_dupl.end(), seq_.begin(), seq_.begin() + pos_2);
 
-        insert(pos_3, seq_dupl);
+        // insert(pos_3, seq_dupl);
     }
 }
 
@@ -127,11 +132,11 @@ int Dna::promoter_at(int pos) {
 
     for (int motif_id = 0; motif_id < PROM_SIZE; motif_id++) {
         int search_pos = pos + motif_id;
-        if (search_pos >= seq_.size())
-            search_pos -= seq_.size();
+        if (search_pos >= seq_bitset_.size())
+            search_pos -= seq_bitset_.size();
         // Searching for the promoter
         prom_dist[motif_id] =
-                PROM_SEQ[motif_id] == seq_[search_pos] ? 0 : 1;
+                (int)(PROM_SEQ[motif_id] - '0') == (int)seq_bitset_[search_pos] ? 0 : 1;
 
     }
 
@@ -176,7 +181,7 @@ int Dna::terminator_at(int pos) {
         if (left >= length()) left -= length();
 
         // Search for the terminators
-        term_dist[motif_id] = seq_[right] != seq_[left] ? 1 : 0;
+        term_dist[motif_id] = seq_bitset_[right] != seq_bitset_[left] ? 1 : 0;
     }
     int dist_term_lead = term_dist[0] +
                          term_dist[1] +
@@ -193,10 +198,10 @@ bool Dna::shine_dal_start(int pos) {
     for (int k = 0; k < SHINE_DAL_SIZE + CODON_SIZE; k++) {
         k_t = k >= SHINE_DAL_SIZE ? k + SD_START_SPACER : k;
         t_pos = pos + k_t;
-        if (t_pos >= seq_.size())
-            t_pos -= seq_.size();
+        if (t_pos >= seq_bitset_.size())
+            t_pos -= seq_bitset_.size();
 
-        if (seq_[t_pos] == SHINE_DAL_SEQ[k_t]) {
+        if ((int)seq_bitset_[t_pos] == (int)(SHINE_DAL_SEQ[k_t] - '0')) {
             start = true;
         } else {
             start = false;
@@ -213,10 +218,10 @@ bool Dna::protein_stop(int pos) {
 
     for (int k = 0; k < CODON_SIZE; k++) {
         t_k = pos + k;
-        if (t_k >= seq_.size())
-            t_k -= seq_.size();
+        if (t_k >= seq_bitset_.size())
+            t_k -= seq_bitset_.size();
 
-        if (seq_[t_k] == PROTEIN_END[k]) {
+        if ((int)seq_bitset_[t_k] == (int)(PROTEIN_END[k] - '0')) {
             is_protein = true;
         } else {
             is_protein = false;
@@ -234,9 +239,9 @@ int Dna::codon_at(int pos) {
 
     for (int i = 0; i < CODON_SIZE; i++) {
         t_pos = pos + i;
-        if (t_pos >= seq_.size())
-            t_pos -= seq_.size();
-        if (seq_[t_pos] == '1')
+        if (t_pos >= seq_bitset_.size())
+            t_pos -= seq_bitset_.size();
+        if (seq_bitset_[t_pos] == 1)
             value += 1 << (CODON_SIZE - i - 1);
     }
 

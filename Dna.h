@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <zlib.h>
+#include <boost/dynamic_bitset.hpp>
 
 #include "Threefry.h"
 #include "aevol_constants.h"
@@ -27,7 +28,7 @@ public:
 
     void load(gzFile backup_file);
 
-    void set(int pos, char c);
+    void set(int pos, bool c);
 
     /// Remove the DNA inbetween pos_1 and pos_2
     void remove(int pos_1, int pos_2);
@@ -52,5 +53,6 @@ public:
 
     int codon_at(int pos);
 
-    std::vector<char> seq_;
+    // std::vector<char> seq_;
+    boost::dynamic_bitset<> seq_bitset_;
 };
