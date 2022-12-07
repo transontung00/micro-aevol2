@@ -53,6 +53,5 @@ public:
 
     int codon_at(int pos);
 
-    // std::vector<char> seq_;
     boost::dynamic_bitset<> seq_bitset_;
 };

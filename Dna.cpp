@@ -6,14 +6,12 @@
 
 #include <cassert>
 
-// Dna::Dna(int length, Threefry::Gen &&rng) : seq_(length) {
 Dna::Dna(int length, Threefry::Gen &&rng) {
 
     seq_bitset_ = boost::dynamic_bitset<>(length);
 
     // Generate a random genome
     for (int32_t i = 0; i < length; i++) {
-        // seq_[i] = '0' + rng.random(NB_BASE);
         seq_bitset_[i] = rng.random(NB_BASE);
     }
 }

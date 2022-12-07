@@ -50,7 +50,10 @@ cuExpManager::cuExpManager(const ExpManager* cpu_exp) {
     for (int i = 0; i < nb_indivs_; ++i) {
         host_individuals_[i] = new char[genome_length_];
         const auto& org = cpu_exp->internal_organisms_[i];
-        // memcpy(host_individuals_[i], org->dna_->seq_.data(), genome_length_ * sizeof(char));
+        std::string tmp;
+        boost::to_string(org->dna_->seq_bitset_, tmp);
+        reverse(tmp.begin(), tmp.end());
+        memcpy(host_individuals_[i], tmp.data(), genome_length_ * sizeof(char));
     }
 
     target_ = new double[FUZZY_SAMPLING];
