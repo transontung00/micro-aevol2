@@ -163,10 +163,10 @@ void cuExpManager::run_evolution(int nb_gen) {
 
         run_a_step();
 
-        if (AeTime::time() % backup_step_ == 0) {
-            save(AeTime::time());
+        // if (AeTime::time() % backup_step_ == 0) {
+            // save(AeTime::time());
             // cout << "Backup for generation " << AeTime::time() << " done !" << endl;
-        }
+        // }
     }
 
     check_result<<<1,1>>>(nb_indivs_, device_individuals_);
