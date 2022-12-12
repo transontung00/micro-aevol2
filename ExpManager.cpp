@@ -442,10 +442,10 @@ void ExpManager::run_evolution(int nb_gen) {
             dna_mutator_array_[indiv_id] = nullptr;
         }
 
-        if (AeTime::time() % backup_step_ == 0) {
-            save(AeTime::time());
+        // if (AeTime::time() % backup_step_ == 0) {
+            // save(AeTime::time());
             // cout << "Backup for generation " << AeTime::time() << " done !" << endl;
-        }
+        // }
     }
 
     for (int indiv_id = 0; indiv_id < nb_indivs_; ++indiv_id) {
