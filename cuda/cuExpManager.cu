@@ -601,7 +601,7 @@ void init_device_population(int nb_indivs, int genome_length, cuIndividual* all_
         local_indiv.list_gene = nullptr;
         local_indiv.list_protein = nullptr;
         local_indiv.fitness = 0.0;
-        local_indiv.mutated = true;
+        local_indiv.mutated = false;
         for (int j = 0; j < FUZZY_SAMPLING; ++j) {
             local_indiv.phenotype[j] = 0.0;
         }
